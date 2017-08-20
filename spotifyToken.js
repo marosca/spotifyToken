@@ -16,14 +16,6 @@ app.use(function(req, res, next) {
   next();
 });
 
-app.use(express.static(__dirname + '/'));
-app.set('view engine', 'ejs');
-
-app.get('/', function(req,res){
-   res.write("This a service install in the route ./get_token");
- });
-
-
 app.post('/get_token', function (req, res) {
 
   var getClientId = function(){
