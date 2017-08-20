@@ -6,7 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "start":"node spotifyToken.js",
+  "start": "node spotifyToken.js",
   "author": "Mariola Moreno",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.17.2"
+  }
 }
