@@ -106,4 +106,4 @@ export class SearchComponent implements OnInit {
 
 }
 ```
-
+<h2>try the service in: https://spotifygeneratetoken.herokuapp.com/get_token</2>
