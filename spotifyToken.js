@@ -1,5 +1,4 @@
 var express = require('express');
-
 var request = require('request'); // "Request" library
 
 
@@ -21,12 +20,8 @@ app.post('/get_token', function (req, res) {
 
   var getClientId = function(){
     var pr = new Promise(function(resolve, reject){
-      var datos = {
-        client_id : req.body.client_id, // Your client id
-        client_secret : req.body.client_id, // Your secret
-        grant_type : req.body.grant_type
-      };
-      if (datos.client_id && datos.client_secret && datos.grant_type)
+
+      if (req.body.client_id && req.body.client_secret && req.body.grant_type)
       resolve(req.body);
     });
     return pr;
@@ -35,11 +30,6 @@ app.post('/get_token', function (req, res) {
   var solicitarToken = function(data){
 
     var pr = new Promise(function(resolve, reject){
-      var datos = {
-        client_id : req.body.client_id, // Your client id
-        client_secret : req.body.client_id, // Your secret
-        grant_type : req.body.grant_type
-      };
 
       var authOptions = {
         url: 'https://accounts.spotify.com/api/token',
@@ -64,7 +54,6 @@ app.post('/get_token', function (req, res) {
   };
 
   var devolverToken = function (data){
-    console.log(data);
     res.send(data);
 
   };
@@ -74,8 +63,6 @@ app.post('/get_token', function (req, res) {
     .then(devolverToken);
 
 });
-
-
 
 
 var server = app.listen(3000, function () {
