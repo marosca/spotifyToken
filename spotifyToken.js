@@ -16,7 +16,7 @@ app.use(function(req, res, next) {
 });
 
 app.get('/', function(req,res){
-  res.send("This a service install in the route ./get_token");
+  res.render("This a service install in the route ./get_token");
 });
 app.post('/get_token', function (req, res) {
 
