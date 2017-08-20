@@ -1,0 +1,11 @@
+{
+  "name": "spotify_token",
+  "version": "1.0.0",
+  "description": "Nodejs serve to provide token for connect to Spotifys Api",
+  "main": "spotifyToken.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mariola Moreno",
+  "license": "ISC"
+}
