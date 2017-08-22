@@ -26,7 +26,7 @@ para conseguir el "client credentials" necesario para trabajar con la API de SPO
 
 *spotify.service.ts*
 ```
-    import { Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Http, Headers } from '@angular/http';
 import 'rxjs/add/operator/map';
 import {Observable} from 'rxjs/Observable';
@@ -44,9 +44,9 @@ export class SpotifyService {
 
     getTokenFromSpotify(){
 
-		let url = 'https://spotifygeneratetoken.herokuapp.com/get_token';
-        let client_id = '9027c81b4bf0438d904415937a6757ee';
-        let client_secret = 'c7a7d99ce2da4a7aa0b7b7e70f602e16';
+	let url = 'https://spotifygeneratetoken.herokuapp.com/get_token';
+        let client_id = 'YOUR CLIENT ID';
+        let client_secret = 'YOUR CLIENT SECRET';
         let grant_type = 'client_credentials';
 
         let headers = new Headers();
