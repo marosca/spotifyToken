@@ -8,7 +8,7 @@ para conseguir el "client credentials" necesario para trabajar con la API de SPO
 
     '/get_token';
 
-<b>Parámetro necesarios que ha de ser enviados a la ruta por post</b>
+<b>Parámetros necesarios que ha de ser enviados a la ruta por el verbo post</b>
 
         client_id // Your client id
         client_secret // Your client secret
@@ -17,7 +17,9 @@ para conseguir el "client credentials" necesario para trabajar con la API de SPO
 <b>Return del servicio</b>
 
         token // el servicio hace una llamada a 'https://accounts.spotify.com/api/token' y
-        devuelve un token válido generado a partir del client_id, client_secret y grant_type
+        devuelve un token válido generado a partir del client_id, client_secret y grant_type. En la
+	primera llamada guarda el valor del token en el localStorage. La siguiente vez hace la comprobación
+	de que existe el token en el storage y de que no ha expirado antes de realizar de nuevo la petición por http
 
 
 <b>Example in Angular 4</b>
@@ -25,60 +27,106 @@ para conseguir el "client credentials" necesario para trabajar con la API de SPO
 *spotify.service.ts*
 ```
     import { Injectable } from '@angular/core';
-    import { Http, Headers } from '@angular/http';
-    import 'rxjs/add/operator/map';
+import { Http, Headers } from '@angular/http';
+import 'rxjs/add/operator/map';
+import {Observable} from 'rxjs/Observable';
 
-    @Injectable()
-    export class SpotifyService {
-        artistas:any [] = [];
+@Injectable()
+export class SpotifyService {
+    artistas:any [] = [];
+    artista:any [] = [];
 
-        urlBusqueda = 'https://api.spotify.com/v1/search';
-        urlArtista = 'https://api.spotify.com/v1/artists';
+    urlBusqueda = 'https://api.spotify.com/v1/search';
+    urlArtista = 'https://api.spotify.com/v1/artists';
 
 
-        constructor( private http:Http ) { }
+    constructor( private http:Http ) { }
 
-        getToken(){
-            let url = 'https://spotifygeneratetoken.herokuapp.com/get_token';
-            let client_id = 'YOUR CLIENT ID';
-            let client_secret = 'YOUR CLIENT SECRET';
-            let grant_type = 'client_credentials';
+    getTokenFromSpotify(){
 
-            let headers = new Headers();
-            headers.append('Content-Type', 'application/json');
+		let url = 'https://spotifygeneratetoken.herokuapp.com/get_token';
+        let client_id = '9027c81b4bf0438d904415937a6757ee';
+        let client_secret = 'c7a7d99ce2da4a7aa0b7b7e70f602e16';
+        let grant_type = 'client_credentials';
 
-            let data = JSON.stringify ({
-                client_id: client_id,
-                client_secret: client_secret,
-                grant_type: grant_type
+        let headers = new Headers();
+		headers.append('Content-Type', 'application/json');
 
+        let data = JSON.stringify ({
+            client_id: client_id,
+            client_secret: client_secret,
+            grant_type: grant_type
+
+        });
+
+        return this.http.post(url, data, { headers })
+            .map(res => {
+                let token =
+                    JSON.stringify({
+                        token: 'Bearer ' + res["_body"],
+                        time: new Date()
+                    });
+                if (window.localStorage)
+                    localStorage['spotifyToken'] = token;
+
+                return 'Bearer ' + res["_body"];
             });
+    };
 
-            return this.http.post(url, data, { headers })
-                .map(res => 'Bearer ' + res["_body"]);
-        };
-
-
-        getArtistas( termino:string, token:string ){
-
-            let headers = new Headers();
-            headers.append( 'Authorization', token);
-
-            let query = `?q=${ termino }&type=artist`;
-            let url = this.urlBusqueda + query ;
-
-            return this.http.get( url, { headers })
-            .map( res => {
-                //console.log( JSON.parse(res['_body']) ); //esto hace lo mismo que res.json(), json() es una función que traen los response pasados por un map y consiste en hacer un parse de lo que se envía en el body como respuesta
-
-                this.artistas = res.json().artists.items;
-                console.log(this.artistas);
-                return this.artistas;
-            });
-
-        }
-
+    isTokenExpired(){
+        let last = JSON.parse( localStorage.spotifyToken ).time;
+        let now = new Date().getTime();
+        let diff = ( now - last) / (1000);
+        return (diff >= 3600);
     }
+
+    getToken(){
+        if (localStorage.spotifyToken && !this.isTokenExpired() ){
+            let localTokenObj = JSON.parse( localStorage.spotifyToken );
+
+            let localToken = new Observable( observer => {
+                observer.next( localTokenObj.token );
+                observer.complete();
+            });
+            console.log('TOKEN EXTRAIDO DE LOCALSTORAGE');
+            return localToken;
+
+        } else {
+            console.log('TOKEN de Spotify');
+            return this.getTokenFromSpotify();
+        }
+    }
+
+    getArtistas( termino:string, token?:string ){
+
+        let headers = new Headers();
+        headers.append( 'Authorization', token);
+
+        let query = `?q=${ termino }&type=artist`;
+        let url = this.urlBusqueda + query ;
+
+        return this.http.get( url, { headers })
+        .map( res => {
+            //console.log( JSON.parse(res['_body']) ); //esto hace lo mismo que res.json(), json() es una función que traen los response pasados por un map y consiste en hacer un parse de lo que se envía en el body como respuesta
+
+            this.artistas = res.json().artists.items;
+			console.log(this.artistas);
+            return this.artistas;
+        });
+    };
+
+    getArtista(id:string, token:string){
+        let headers = new Headers();
+        headers.append( 'Authorization', token);
+
+        let url = this.urlArtista + '/' + id ;
+
+        return this.http.get( url , { headers })
+            .map( res => res.json());
+    }
+
+}
+
 ```
 *search.component.ts*
 ```
@@ -100,7 +148,7 @@ export class SearchComponent implements OnInit {
 
     buscarArtista(){
 		this._spotifyService.getToken().subscribe( token => {
-            this._spotifyService.getArtistas( this.termino, token ).subscribe();
+            this._spotifyService.getArtistas( this.termino, String(token) ).subscribe();
         });
     }
 
