@@ -3,6 +3,8 @@ Servicio sobre NodeJs que devuelve el token para conectar a la API de Spotify
 
 Script JS ejecutado sobre NodeJs que provee un servicio cuya finalidad es devolver un token válido 
 para conseguir el "client credentials" necesario para trabajar con la API de SPOTIFY.
+En el ejemplo de más abajo se guarda este token en el localStorage y se verifica si ha expirado
+para evitar hacer llamadas constantes a la api de Spotify.
 
 <b>Ruta del servicio </b>  
 
