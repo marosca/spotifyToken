@@ -79,7 +79,7 @@ export class SpotifyService {
         let last = new Date( JSON.parse( localStorage.spotifyToken ).time );
         let now = new Date();
         let diff = ( Number(now)- Number(last) ) / (1000);
-        return (diff >= 1);
+        return (diff >= 3600);
     }
 
     getToken(){
