@@ -76,10 +76,10 @@ export class SpotifyService {
     };
 
     isTokenExpired(){
-        let last = JSON.parse( localStorage.spotifyToken ).time;
-        let now = new Date().getTime();
-        let diff = ( now - last) / (1000);
-        return (diff >= 3600);
+        let last = new Date( JSON.parse( localStorage.spotifyToken ).time );
+        let now = new Date();
+        let diff = ( Number(now)- Number(last) ) / (1000);
+        return (diff >= 1);
     }
 
     getToken(){
